@@ -59,9 +59,9 @@ let readProductController = async (req, res) => {
 
 let updateProductController = async (req, res) => {
   try {
-    let { Id } = req.params;
+    let { id } = req.params;
 
-    if (!Id) {
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: "Id is required",
@@ -78,7 +78,7 @@ let updateProductController = async (req, res) => {
     }
 
     let updateProduct = await productModel.findByIdAndUpdate(
-      Id,
+      id,
       {
         name,
         description,
@@ -86,7 +86,7 @@ let updateProductController = async (req, res) => {
         category,
         image,
       },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     if (!updateProduct) {
@@ -110,8 +110,39 @@ let updateProductController = async (req, res) => {
   }
 };
 
+let deleteProductController = async (req, res) => {
+  try {
+    let { id } = req.params;
+    if (!id)
+      return res.status(400).json({
+        success: false,
+        message: "Product ID is required",
+      });
+    let deletedProduct = await productModel.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createProductController,
   readProductController,
   updateProductController,
+  deleteProductController,
 };

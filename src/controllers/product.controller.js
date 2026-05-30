@@ -4,7 +4,6 @@ let createProductController = async (req, res) => {
   try {
     let { name, description, price, category, image } = req.body;
     
-    // Validates that name exists and price is a valid number
     if (!name || price == null || isNaN(price)) {
       return res.status(400).json({
         success: false,
@@ -26,14 +25,31 @@ let createProductController = async (req, res) => {
       product: newProduct,
     });
   } catch (error) {
-    // Log the error locally for server debugging
+   
     console.error("Error creating product:", error);
 
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message // Helps you debug errors instantly in Postman
+      error: error.message 
     });
+  }
+};
+
+let readProductController = async (req, res) => {
+  try {
+    const { category } = req.query;
+    let filter = {};
+
+
+    if (category) {
+      filter.category = category.toLowerCase().trim();
+    }
+
+    const products = await Product.find(filter);
+    res.status(200).json({ success: true, count: products.length, data: products });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 

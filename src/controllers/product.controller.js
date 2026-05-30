@@ -36,23 +36,26 @@ let createProductController = async (req, res) => {
   }
 };
 
+
 let readProductController = async (req, res) => {
-  try {
-    const { category } = req.query;
-    let filter = {};
+ try {
+  let getAllproduct = await productModel.find();
 
+  return res.status(200).json({
+    message:`get all product successfully`,
+    getAllproduct
+  })
 
-    if (category) {
-      filter.category = category.toLowerCase().trim();
-    }
-
-    const products = await Product.find(filter);
-    res.status(200).json({ success: true, count: products.length, data: products });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  
+ } catch (error) {
+  return res.status(500).json({
+    message:`get server error${error}`
+  })
+  
+ }
 };
 
 module.exports = {
   createProductController,
+  readProductController,
 };

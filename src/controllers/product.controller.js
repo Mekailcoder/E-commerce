@@ -3,7 +3,7 @@ const productModel = require("../models/product.model");
 let createProductController = async (req, res) => {
   try {
     let { name, description, price, category, image } = req.body;
-    
+
     if (!name || price == null || isNaN(price)) {
       return res.status(400).json({
         success: false,
@@ -25,37 +25,93 @@ let createProductController = async (req, res) => {
       product: newProduct,
     });
   } catch (error) {
-   
     console.error("Error creating product:", error);
 
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message 
+      error: error.message,
     });
   }
 };
 
-
 let readProductController = async (req, res) => {
- try {
-  let getAllproduct = await productModel.find();
+  try {
+    let getAllproduct = await productModel.find();
 
-  return res.status(200).json({
-    message:`get all product successfully`,
-    getAllproduct
-  })
+    if (!getAllproduct.length) {
+      return res.status(204).json({
+        message: `get all product successfully`,
+        getAllproduct,
+      });
+    }
 
-  
- } catch (error) {
-  return res.status(500).json({
-    message:`get server error${error}`
-  })
-  
- }
+    return res.status(200).json({
+      message: `get all product successfully`,
+      product: getAllproduct,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: `get server error${error}`,
+    });
+  }
+};
+
+let updateProductController = async (req, res) => {
+  try {
+    let { Id } = req.params;
+
+    if (!Id) {
+      return res.status(400).json({
+        success: false,
+        message: "Id is required",
+      });
+    }
+
+    let { name, description, price, category, image } = req.body;
+
+    if (!name || price == null || isNaN(price)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid name and price are required",
+      });
+    }
+
+    let updateProduct = await productModel.findByIdAndUpdate(
+      Id,
+      {
+        name,
+        description,
+        price,
+        category,
+        image,
+      },
+      { new: true },
+    );
+
+    if (!updateProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product: updateProduct,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message,
+    });
+  }
 };
 
 module.exports = {
   createProductController,
   readProductController,
+  updateProductController,
 };

@@ -46,6 +46,10 @@ let readProductController = async (req, res) => {
       });
     }
 
+
+
+
+
     return res.status(200).json({
       message: `get all product successfully`,
       product: getAllproduct,
